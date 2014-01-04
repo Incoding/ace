@@ -1,64 +1,53 @@
 package com.aicai.core;
 
 import java.lang.reflect.Method;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.aicai.annotation.Url;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import com.aicai.exception.AicaiMvcException;
 import com.aicai.reflection.ClassUtil;
 
 public class ActionExecutor {
-    public static ConcurrentHashMap<String, Object> actionMaping = new ConcurrentHashMap<String, Object>();
+    public static ConcurrentHashMap<String, ActionWrapper> actionMaping = new ConcurrentHashMap<String, ActionWrapper>();
 
-    public static void main(String[] args) {
-        Set<Class<?>> a = ClassUtil.getClasses("com.aicai.mvc");
-        registerAction(a);
-        // 过来的请求
-        ActionMapping am = new ActionMapping("HelloWorld", "com.aicai.mvc",
-                "helloworld", null);
-        // new ActionExecutor().executor(am);
+    public void init() {
+        Set<Class<?>> actionClasses = ClassUtil.getClasses("com.aicai.mvc");
+        ClassUtil.registerAction(actionClasses, actionMaping);
     }
 
-    private static void registerAction(Set<Class<?>> a) {
-        for (Iterator<Class<?>> iterator = a.iterator(); iterator.hasNext();) {
-            Class<?> controllerClass = iterator.next();
-            String controllerName = controllerClass.getName();
-            Method[] methods = controllerClass.getMethods();
-            for (Method method : methods) {
-                String methodName = method.getName();
-                if (method.isAnnotationPresent(Url.class)) {
-                    // 有action注解的时候
-                    ActionWrapper action = new ActionWrapper(controllerClass,
-                            method);
-                    // TODO to be more perfermance
-                    actionMaping.put(controllerName + methodName, action);
-                } else if (methodName.equals("index")) {
-                    // 默认index
-                    ActionWrapper action = new ActionWrapper(controllerClass,
-                            method);
-                    actionMaping.put(controllerName + methodName, action);
-                }
-                // else {
-                // // 不是默认index,则根据 namespace,name,method进行映射
-                // }
-            }
-
+    public void execute(HttpServletRequest req, HttpServletResponse resp) {
+        // TODO 如何高效获得namespace,name,method
+        String uri = req.getRequestURI();
+        // TODO string split performance
+        String[] uriArray = uri.split("/");
+        String actionName = uriArray[uri.length() - 2];
+        String actionmethod = uriArray[uri.length() - 1];
+        // String method = uri.substring(uri.lastIndexOf("/"));
+        ActionWrapper aw = actionMaping.get(actionName + actionmethod);
+        if (null != aw) {
+            actionExecutor(actionName, aw.getControllerClass(), actionmethod,
+                    aw.getMethod());
+        } else {
+            throw new AicaiMvcException("action can not find .");
         }
+        // ActionMapping am = new ActionMapping("HelloWorld", "com.aicai.mvc",
+        // "helloworld", null);
     }
 
-    public ActionResult executor(ActionMapping ap) {
+    private void actionExecutor(String actionName, Class<?> actionClass,
+            String actionmethod, Method method) {
         Class<Object> c[] = null;
-        Method method = null;
         AicaiAction ac = null;
         Object[] ob = null;
         try {
             // TODO string concat performance
             @SuppressWarnings("unchecked")
-            Class<AicaiAction> actionClass = (Class<AicaiAction>) Class
-                    .forName(ap.getNamespace() + "." + ap.getName());
-            method = actionClass.getDeclaredMethod(ap.getMethod(), c);
+            // Class<AicaiAction> actionClass = (Class<AicaiAction>) Class
+            // .forName(actionName + "." + actionmethod);
+            // method = actionClass.getDeclaredMethod(actionmethod, c);
             Object action = actionClass.newInstance();
             if (action instanceof AicaiAction) {
                 ac = (AicaiAction) action;
@@ -68,6 +57,7 @@ public class ActionExecutor {
             if (!(e instanceof RuntimeException))
                 throw new AicaiMvcException("action can not find");
         }
-        return null;
+
     }
+
 }

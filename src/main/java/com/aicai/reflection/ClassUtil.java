@@ -4,20 +4,25 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import jodd.util.StringUtil;
 
 import com.aicai.annotation.Action;
+import com.aicai.annotation.Url;
+import com.aicai.core.ActionWrapper;
 
 public class ClassUtil {
 
@@ -174,6 +179,34 @@ public class ClassUtil {
                     e.printStackTrace();
                 }
             }
+        }
+    }
+
+    public static void registerAction(Set<Class<?>> a,
+            ConcurrentHashMap<String, ActionWrapper> actionMaping) {
+        for (Iterator<Class<?>> iterator = a.iterator(); iterator.hasNext();) {
+            Class<?> controllerClass = iterator.next();
+            String controllerName = controllerClass.getName();
+            Method[] methods = controllerClass.getMethods();
+            for (Method method : methods) {
+                String methodName = method.getName();
+                if (method.isAnnotationPresent(Url.class)) {
+                    // 有action注解的时候
+                    ActionWrapper action = new ActionWrapper(controllerClass,
+                            method);
+                    // TODO to be more perfermance
+                    actionMaping.put(controllerName + methodName, action);
+                } else if (methodName.equals("index")) {
+                    // 默认index
+                    ActionWrapper action = new ActionWrapper(controllerClass,
+                            method);
+                    actionMaping.put(controllerName + methodName, action);
+                }
+                // else {
+                // // 不是默认index,则根据 namespace,name,method进行映射
+                // }
+            }
+
         }
     }
 

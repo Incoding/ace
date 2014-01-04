@@ -7,16 +7,16 @@
 
 
 	<filter>
-		<description>AicaiMvc</description>
-		<filter-name>Aicaimvc</filter-name>
-		<filter-class>com.aicai.AFilter</filter-class>
+		<description>aicaimvc</description>
+		<filter-name>aicaimvc</filter-name>
+		<filter-class>com.aicai.core.AFilter</filter-class>
 		<init-param>
 			<param-name>222</param-name>
 			<param-value>333</param-value>
 		</init-param>
 	</filter>
 	<filter-mapping>
-		<filter-name>AicaiMvc</filter-name>
+		<filter-name>aicaimvc</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 

@@ -12,9 +12,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class AFilter implements Filter {
+    ActionExecutor ace;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        ace = new ActionExecutor();
+        ace.init();
     }
 
     @Override
@@ -24,8 +27,8 @@ public class AFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) res;
         // TODO prepare
         // TODO deal
-        new ActionMapping().build(request, response);
         // ActionExecutor
+        ace.execute(request, response);
         // TODO do some clean
     }
 
