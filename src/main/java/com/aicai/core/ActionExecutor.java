@@ -23,8 +23,8 @@ public class ActionExecutor {
         String uri = req.getRequestURI();
         // TODO string split performance
         String[] uriArray = uri.split("/");
-        String actionName = uriArray[uri.length() - 2];
-        String actionmethod = uriArray[uri.length() - 1];
+        String actionName = uriArray[uriArray.length - 2];
+        String actionmethod = uriArray[uriArray.length - 1];
         // String method = uri.substring(uri.lastIndexOf("/"));
         ActionWrapper aw = actionMaping.get(actionName + actionmethod);
         if (null != aw) {

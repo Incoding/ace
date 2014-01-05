@@ -17,6 +17,10 @@ public class Test {
         Set<Class<?>> a = ClassUtil.getClasses("com.aicai.mvc");
         registerAction(a);
         // 过来的请求
+        String uri = "/aicai/name/method";
+        String[] uriArray = uri.split("/");
+        String actionName = uriArray[uriArray.length - 2];
+        String actionmethod = uriArray[uriArray.length - 1];
         ActionMapping am = new ActionMapping("HelloWorld", "com.aicai.mvc",
                 "helloworld", null);
         // new ActionExecutor().executor(am);

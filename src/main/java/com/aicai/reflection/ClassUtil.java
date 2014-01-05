@@ -186,7 +186,7 @@ public class ClassUtil {
             ConcurrentHashMap<String, ActionWrapper> actionMaping) {
         for (Iterator<Class<?>> iterator = a.iterator(); iterator.hasNext();) {
             Class<?> controllerClass = iterator.next();
-            String controllerName = controllerClass.getName();
+            String controllerName = controllerClass.getSimpleName();
             Method[] methods = controllerClass.getMethods();
             for (Method method : methods) {
                 String methodName = method.getName();
