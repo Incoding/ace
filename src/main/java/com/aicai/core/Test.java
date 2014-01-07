@@ -1,10 +1,15 @@
 package com.aicai.core;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.aicai.annotation.In;
+import com.aicai.annotation.Out;
 import com.aicai.annotation.Url;
 import com.aicai.exception.AicaiMvcException;
 import com.aicai.reflection.ClassUtil;
@@ -34,20 +39,33 @@ public class Test {
     public static void registerAction(Set<Class<?>> a) {
         for (Iterator<Class<?>> iterator = a.iterator(); iterator.hasNext();) {
             Class<?> controllerClass = iterator.next();
-            String controllerName = controllerClass.getName();
+            String controllerName = controllerClass.getSimpleName();
             Method[] methods = controllerClass.getMethods();
+            Map<String, String> inparamNames = new HashMap<String, String>();
+            Map<String, String> outParamNames = new HashMap<String, String>();
+            int paramNumber = 0;
+            Field[] fileds = controllerClass.getFields();
+            for (Field filed : fileds) {
+                // in param ,
+                if (filed.isAnnotationPresent(In.class)) {
+                    inparamNames.put(filed.getName(), filed.getName());
+                }
+                if (filed.isAnnotationPresent(Out.class)) {
+                    outParamNames.put(filed.getName(), filed.getName());
+                }
+            }
             for (Method method : methods) {
                 String methodName = method.getName();
                 if (method.isAnnotationPresent(Url.class)) {
                     // 有action注解的时候
                     ActionWrapper action = new ActionWrapper(controllerClass,
-                            method);
+                            method, inparamNames, outParamNames);
                     // TODO to be more perfermance
                     actionMaping.put(controllerName + methodName, action);
                 } else if (methodName.equals("index")) {
                     // 默认index
                     ActionWrapper action = new ActionWrapper(controllerClass,
-                            method);
+                            method, inparamNames, outParamNames);
                     actionMaping.put(controllerName + methodName, action);
                 }
                 // else {

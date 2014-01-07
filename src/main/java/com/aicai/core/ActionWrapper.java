@@ -1,15 +1,21 @@
 package com.aicai.core;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
 public class ActionWrapper {
-    Class<?> controllerClass;
-    Method   method;
+    Class<?>            controllerClass;
+    Method              method;
+    Map<String, String> inParamNames;
+    Map<String, String> outParamNames;
 
-    public ActionWrapper(Class<?> controllerClass2, Method method) {
+    public ActionWrapper(Class<?> controllerClass, Method method,
+            Map<String, String> inParamNames, Map<String, String> outParamNames) {
         super();
-        this.controllerClass = controllerClass2;
+        this.controllerClass = controllerClass;
         this.method = method;
+        this.inParamNames = inParamNames;
+        this.outParamNames = outParamNames;
     }
 
     public Class<?> getControllerClass() {
@@ -26,6 +32,22 @@ public class ActionWrapper {
 
     public void setMethod(Method method) {
         this.method = method;
+    }
+
+    public Map<String, String> getInParamNames() {
+        return inParamNames;
+    }
+
+    public void setInParamNames(Map<String, String> inParamNames) {
+        this.inParamNames = inParamNames;
+    }
+
+    public Map<String, String> getOutParamNames() {
+        return outParamNames;
+    }
+
+    public void setOutParamNames(Map<String, String> outParamNames) {
+        this.outParamNames = outParamNames;
     }
 
 }

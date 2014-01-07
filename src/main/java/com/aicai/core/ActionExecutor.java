@@ -1,6 +1,10 @@
 package com.aicai.core;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,28 +33,38 @@ public class ActionExecutor {
         ActionWrapper aw = actionMaping.get(actionName + actionmethod);
         if (null != aw) {
             actionExecutor(actionName, aw.getControllerClass(), actionmethod,
-                    aw.getMethod());
+                    aw.getMethod(), aw.getInParamNames(), req);
         } else {
-            throw new AicaiMvcException("action can not find .");
+            throw new AicaiMvcException("path" + actionName + actionmethod
+                    + "can not find corresponding action");
         }
         // ActionMapping am = new ActionMapping("HelloWorld", "com.aicai.mvc",
         // "helloworld", null);
     }
 
     private void actionExecutor(String actionName, Class<?> actionClass,
-            String actionmethod, Method method) {
+            String actionmethod, Method method,
+            Map<String, String> inParamNames, HttpServletRequest req) {
         Class<Object> c[] = null;
-        AicaiAction ac = null;
         Object[] ob = null;
         try {
             // TODO string concat performance
-            @SuppressWarnings("unchecked")
             // Class<AicaiAction> actionClass = (Class<AicaiAction>) Class
             // .forName(actionName + "." + actionmethod);
             // method = actionClass.getDeclaredMethod(actionmethod, c);
-            Object action = actionClass.newInstance();
-            if (action instanceof AicaiAction) {
-                ac = (AicaiAction) action;
+            // TODO more reflect performance
+            // Thread.currentThread().getContextClassLoader().loadClass(name)
+            Object action = actionClass.getDeclaredConstructor().newInstance();
+            Iterator<Entry<String, String>> it = inParamNames.entrySet()
+                    .iterator();
+            while (it.hasNext()) {
+                Map.Entry<String, String> entry = it.next();
+
+                String value = req.getParameter(entry.getKey());
+                Field f = actionClass.getField(entry.getKey());
+                f.setAccessible(true);
+                f.set(action, value);
+                f.setAccessible(false);
             }
             method.invoke(action, ob);
         } catch (Exception e) {
@@ -59,5 +73,4 @@ public class ActionExecutor {
         }
 
     }
-
 }

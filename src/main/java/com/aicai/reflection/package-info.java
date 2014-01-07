@@ -1,8 +1,5 @@
 /**
- * 
- */
-/**
- * @author hncw
+ * @author wk
  *
  */
 package com.aicai.reflection;
