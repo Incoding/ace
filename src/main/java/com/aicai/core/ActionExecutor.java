@@ -33,7 +33,8 @@ public class ActionExecutor {
         ActionWrapper aw = actionMaping.get(actionName + actionmethod);
         if (null != aw) {
             actionExecutor(actionName, aw.getControllerClass(), actionmethod,
-                    aw.getMethod(), aw.getInParamNames(), req);
+                    aw.getMethod(), aw.getInParamNames(),
+                    aw.getOutParamNames(), req, resp);
         } else {
             throw new AicaiMvcException("path" + actionName + actionmethod
                     + "can not find corresponding action");
@@ -44,7 +45,9 @@ public class ActionExecutor {
 
     private void actionExecutor(String actionName, Class<?> actionClass,
             String actionmethod, Method method,
-            Map<String, String> inParamNames, HttpServletRequest req) {
+            Map<String, String> inParamNames,
+            Map<String, String> outParamNames, HttpServletRequest req,
+            HttpServletResponse resp) {
         Class<Object> c[] = null;
         Object[] ob = null;
         try {
@@ -55,21 +58,40 @@ public class ActionExecutor {
             // TODO more reflect performance
             // Thread.currentThread().getContextClassLoader().loadClass(name)
             Object action = actionClass.getDeclaredConstructor().newInstance();
-            Iterator<Entry<String, String>> it = inParamNames.entrySet()
+            Iterator<Entry<String, String>> itIn = inParamNames.entrySet()
                     .iterator();
-            while (it.hasNext()) {
-                Map.Entry<String, String> entry = it.next();
-
+            while (itIn.hasNext()) {
+                Map.Entry<String, String> entry = itIn.next();
                 String value = req.getParameter(entry.getKey());
-                Field f = actionClass.getField(entry.getKey());
+                Field f = actionClass.getDeclaredField(entry.getKey());
                 f.setAccessible(true);
                 f.set(action, value);
                 f.setAccessible(false);
             }
-            method.invoke(action, ob);
+            Object returnValue = method.invoke(action, ob);
+            Iterator<Entry<String, String>> itOut = outParamNames.entrySet()
+                    .iterator();
+            while (itOut.hasNext()) {
+                Map.Entry<String, String> entry = itOut.next();
+                Field f = actionClass.getDeclaredField(entry.getKey());
+                // TODO check if the filed is primitive type; if not then deal
+                // it ;
+                // f.getDeclaringClass().isPrimitive();
+                f.setAccessible(true);
+                if (f.get(action) != null)
+                    req.setAttribute(entry.getKey(), f.get(action));
+                f.setAccessible(false);
+                System.out.println("req参数" + entry.getKey() + "的变量值是"
+                        + req.getAttribute(entry.getKey()).toString());
+            }
+            if (returnValue instanceof String) {
+                req.getRequestDispatcher((String) returnValue).forward(req,
+                        resp);
+            }
+            return;
         } catch (Exception e) {
-            if (!(e instanceof RuntimeException))
-                throw new AicaiMvcException("action can not find");
+            e.printStackTrace();
+            throw new RuntimeException("action can not find");
         }
 
     }

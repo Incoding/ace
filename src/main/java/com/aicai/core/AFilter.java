@@ -22,14 +22,16 @@ public class AFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res,
-            FilterChain arg2) throws IOException, ServletException {
+            FilterChain chain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
         // TODO prepare
         // TODO deal
+
         // ActionExecutor
         ace.execute(request, response);
         // TODO do some clean
+        // chain.doFilter(request, response);
     }
 
     @Override
