@@ -189,18 +189,18 @@ public class ClassUtil {
             Class<?> controllerClass = iterator.next();
             String controllerName = controllerClass.getSimpleName();
             Method[] methods = controllerClass.getMethods();
-            Map<String, String> inparamNames = new HashMap<String, String>();
+            Map<String, Class<?>> inparamNames = new HashMap<String, Class<?>>();
             Map<String, String> outParamNames = new HashMap<String, String>();
-            int paramNumber = 0;
+            // int paramNumber = 0;
 
             Field[] fileds = controllerClass.getDeclaredFields();
-            for (Field filed : fileds) {
+            for (Field field : fileds) {
                 // in param ,
-                if (filed.isAnnotationPresent(In.class)) {
-                    inparamNames.put(filed.getName(), filed.getName());
+                if (field.isAnnotationPresent(In.class)) {
+                    inparamNames.put(field.getName(), field.getType());
                 }
-                if (filed.isAnnotationPresent(Out.class)) {
-                    outParamNames.put(filed.getName(), filed.getName());
+                if (field.isAnnotationPresent(Out.class)) {
+                    outParamNames.put(field.getName(), field.getName());
                 }
             }
             for (Method method : methods) {

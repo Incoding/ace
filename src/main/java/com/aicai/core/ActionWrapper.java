@@ -4,13 +4,14 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 public class ActionWrapper {
-    Class<?>            controllerClass;
-    Method              method;
-    Map<String, String> inParamNames;
-    Map<String, String> outParamNames;
+    Class<?>              controllerClass;
+    Method                method;
+    Map<String, Class<?>> inParamNames;
+    Map<String, String>   outParamNames;
 
     public ActionWrapper(Class<?> controllerClass, Method method,
-            Map<String, String> inParamNames, Map<String, String> outParamNames) {
+            Map<String, Class<?>> inParamNames,
+            Map<String, String> outParamNames) {
         super();
         this.controllerClass = controllerClass;
         this.method = method;
@@ -34,11 +35,11 @@ public class ActionWrapper {
         this.method = method;
     }
 
-    public Map<String, String> getInParamNames() {
+    public Map<String, Class<?>> getInParamNames() {
         return inParamNames;
     }
 
-    public void setInParamNames(Map<String, String> inParamNames) {
+    public void setInParamNames(Map<String, Class<?>> inParamNames) {
         this.inParamNames = inParamNames;
     }
 

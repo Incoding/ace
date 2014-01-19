@@ -1,10 +1,7 @@
 package com.aicai.core;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -13,6 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.aicai.exception.AicaiMvcException;
 import com.aicai.reflection.ClassUtil;
+import com.aicai.util.ParamUtil;
+import com.aicai.util.ResultUtil;
 
 public class ActionExecutor {
     public static ConcurrentHashMap<String, ActionWrapper> actionMaping = new ConcurrentHashMap<String, ActionWrapper>();
@@ -45,7 +44,7 @@ public class ActionExecutor {
 
     private void actionExecutor(String actionName, Class<?> actionClass,
             String actionmethod, Method method,
-            Map<String, String> inParamNames,
+            Map<String, Class<?>> inParamNames,
             Map<String, String> outParamNames, HttpServletRequest req,
             HttpServletResponse resp) {
         Class<Object> c[] = null;
@@ -58,36 +57,10 @@ public class ActionExecutor {
             // TODO more reflect performance
             // Thread.currentThread().getContextClassLoader().loadClass(name)
             Object action = actionClass.getDeclaredConstructor().newInstance();
-            Iterator<Entry<String, String>> itIn = inParamNames.entrySet()
-                    .iterator();
-            while (itIn.hasNext()) {
-                Map.Entry<String, String> entry = itIn.next();
-                String value = req.getParameter(entry.getKey());
-                Field f = actionClass.getDeclaredField(entry.getKey());
-                f.setAccessible(true);
-                f.set(action, value);
-                f.setAccessible(false);
-            }
+            ParamUtil.dealInParam(inParamNames, req, actionClass, action);
             Object returnValue = method.invoke(action, ob);
-            Iterator<Entry<String, String>> itOut = outParamNames.entrySet()
-                    .iterator();
-            while (itOut.hasNext()) {
-                Map.Entry<String, String> entry = itOut.next();
-                Field f = actionClass.getDeclaredField(entry.getKey());
-                // TODO check if the filed is primitive type; if not then deal
-                // it ;
-                // f.getDeclaringClass().isPrimitive();
-                f.setAccessible(true);
-                if (f.get(action) != null)
-                    req.setAttribute(entry.getKey(), f.get(action));
-                f.setAccessible(false);
-                System.out.println("req参数" + entry.getKey() + "的变量值是"
-                        + req.getAttribute(entry.getKey()).toString());
-            }
-            if (returnValue instanceof String) {
-                req.getRequestDispatcher((String) returnValue).forward(req,
-                        resp);
-            }
+            ParamUtil.dealOutParam(outParamNames, req, actionClass, action);
+            ResultUtil.dealResult(returnValue, req, resp);
             return;
         } catch (Exception e) {
             e.printStackTrace();

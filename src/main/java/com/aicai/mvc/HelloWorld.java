@@ -9,11 +9,11 @@ import com.aicai.annotation.Url;
 public class HelloWorld {
     @In
     @Out
-    private String name;
+    private String  name;
 
     @In
     @Out
-    private String age;
+    private Integer age;
 
     public String index() {
         System.out.println("hello world ,hello aicai mvc");

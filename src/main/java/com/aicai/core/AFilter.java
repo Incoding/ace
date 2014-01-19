@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class AFilter implements Filter {
-    ActionExecutor ace;
+    private ActionExecutor ace;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
