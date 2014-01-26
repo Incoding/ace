@@ -35,8 +35,8 @@ public class ActionExecutor {
                     aw.getMethod(), aw.getInParamNames(),
                     aw.getOutParamNames(), req, resp);
         } else {
-            throw new AicaiMvcException("path" + actionName + actionmethod
-                    + "can not find corresponding action");
+            throw new AicaiMvcException("path: action=" + actionName + ",name="
+                    + actionmethod + "can not find corresponding action");
         }
         // ActionMapping am = new ActionMapping("HelloWorld", "com.aicai.mvc",
         // "helloworld", null);
@@ -50,17 +50,19 @@ public class ActionExecutor {
         Class<Object> c[] = null;
         Object[] ob = null;
         try {
-            // TODO string concat performance
-            // Class<AicaiAction> actionClass = (Class<AicaiAction>) Class
-            // .forName(actionName + "." + actionmethod);
-            // method = actionClass.getDeclaredMethod(actionmethod, c);
-            // TODO more reflect performance
-            // Thread.currentThread().getContextClassLoader().loadClass(name)
+            /*
+             * // TODO string concat performance Class<AicaiAction> actionClass
+             * = (Class<AicaiAction>) Class .forName(actionName + "." +
+             * actionmethod); method =
+             * actionClass.getDeclaredMethod(actionmethod, c); // TODO more
+             * reflect performance
+             * Thread.currentThread().getContextClassLoader().loadClass(name)
+             */
             Object action = actionClass.getDeclaredConstructor().newInstance();
             ParamUtil.dealInParam(inParamNames, req, actionClass, action);
             Object returnValue = method.invoke(action, ob);
             ParamUtil.dealOutParam(outParamNames, req, actionClass, action);
-            ResultUtil.dealResult(returnValue, req, resp);
+            ResultUtil.dealResult(method, returnValue, req, resp);
             return;
         } catch (Exception e) {
             e.printStackTrace();

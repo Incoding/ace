@@ -7,6 +7,8 @@ import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.aicai.convert.TypeConverter;
+
 public class ParamUtil {
     public static final void dealInParam(Map<String, Class<?>> inParamNames,
             HttpServletRequest req, Class<?> actionClass, Object action) {
@@ -51,11 +53,11 @@ public class ParamUtil {
                 if (f.get(action) != null)
                     req.setAttribute(entry.getKey(), f.get(action));
                 f.setAccessible(false);
-                System.out.println("req参数的"
-                        + "变量类型是"
-                        + req.getAttribute(entry.getKey()).getClass()
-                                .getSimpleName() + entry.getKey() + "变量值是"
-                        + req.getAttribute(entry.getKey()).toString());
+                // System.out.println("req参数的"
+                // + "变量类型是"
+                // + req.getAttribute(entry.getKey()).getClass()
+                // .getSimpleName() + entry.getKey() + "变量值是"
+                // + req.getAttribute(entry.getKey()).toString());
             } catch (NoSuchFieldException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
