@@ -8,14 +8,16 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.aicai.annotation.ActionResult;
 import com.aicai.annotation.Ajax;
+import com.aicai.core.ActionExecutor;
 
 public class ResultUtil {
 
     private static final String UTF_8 = "UTF-8";
 
     public static void dealResult(Method method, Object returnValue,
-            HttpServletRequest req, HttpServletResponse resp) {
+            HttpServletRequest req, HttpServletResponse resp, ActionExecutor ace) {
         // now this method only can deal jsp
         // TODO
         if (returnValue instanceof String) {
@@ -38,7 +40,10 @@ public class ResultUtil {
                 }
                 return;
             }
-
+            if (method.isAnnotationPresent(ActionResult.class)) {
+                ace.execute(req, resp, result);
+                return;
+            }
             // try {
             // resp.sendRedirect(result);
             // } catch (IOException e) {

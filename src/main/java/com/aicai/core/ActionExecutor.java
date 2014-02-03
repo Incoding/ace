@@ -32,9 +32,16 @@ public class ActionExecutor {
         // interList.add(new Test2Interceptor());
     }
 
-    public void execute(HttpServletRequest req, HttpServletResponse resp) {
+    public void execute(HttpServletRequest req, HttpServletResponse resp,
+            String reqUri) {
         // TODO 如何高效获得namespace,name,method
-        String uri = req.getRequestURI();
+        ActionContext.setActionContext(new RequestWraper(req, resp));
+        String uri = null;
+        if (reqUri != null) {
+            uri = reqUri;
+        } else {
+            uri = req.getRequestURI();
+        }
         // TODO string split performance
         String[] uriArray = uri.split("/");
         String actionName = uriArray[uriArray.length - 2];
@@ -54,24 +61,18 @@ public class ActionExecutor {
                     actionmethod, aw, iterator, action).invoke();
             ParamUtil.dealOutParam(aw.getOutParamNames(), req,
                     aw.getControllerClass(), action);
-            ResultUtil.dealResult(aw.getMethod(), returnValue, req, resp);
+            ResultUtil.dealResult(aw.getMethod(), returnValue, req, resp, this);
         } catch (InstantiationException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IllegalArgumentException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (InvocationTargetException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (NoSuchMethodException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (SecurityException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

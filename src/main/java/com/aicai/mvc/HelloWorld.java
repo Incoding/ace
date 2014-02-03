@@ -3,6 +3,7 @@ package com.aicai.mvc;
 import javax.servlet.http.HttpServletRequest;
 
 import com.aicai.annotation.Action;
+import com.aicai.annotation.ActionResult;
 import com.aicai.annotation.Ajax;
 import com.aicai.annotation.In;
 import com.aicai.annotation.Out;
@@ -41,6 +42,7 @@ public class HelloWorld {
      * @return
      */
     @Url
+    @ActionResult
     public String login() {
         System.out.println("login redirect method");
         return "/aicai-mvc/HelloWorld/renderAjax";
@@ -52,12 +54,14 @@ public class HelloWorld {
      * @return
      */
     @Url
+    @ActionResult
     public String loginForward() {
         System.out.println("login forward method");
         return "/HelloWorld/renderAjax";
     }
 
     @Url
+    @ActionResult
     public String actioncontext() {
         HttpServletRequest req = ActionContext.getActionContext().getReq();
         System.out.println("actioncontext method,path is ==>"

@@ -26,10 +26,9 @@ public class AFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
         // TODO prepare
-        ActionContext.setActionContext(new RequestWraper(request, response));
         // TODO deal
         // ActionExecutor
-        ace.execute(request, response);
+        ace.execute(request, response, null);
         // TODO do some clean
         // chain.doFilter(request, response);
     }
