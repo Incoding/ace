@@ -20,6 +20,11 @@ public class HelloWorld {
     @Out
     private Integer age;
 
+    /**
+     * 响应jsp
+     * 
+     * @return
+     */
     public String index() {
         System.out.println("hello world ,hello aicai mvc");
         System.out.println("hello world -->name=" + name);
@@ -27,6 +32,11 @@ public class HelloWorld {
         return "/helloworld.jsp";
     }
 
+    /**
+     * 响应ajax
+     * 
+     * @return
+     */
     @Url
     @Ajax
     public String renderAjax() {
@@ -37,7 +47,7 @@ public class HelloWorld {
     }
 
     /**
-     * redirect request
+     * 响应请求action
      * 
      * @return
      */
@@ -49,7 +59,7 @@ public class HelloWorld {
     }
 
     /**
-     * forward request
+     * 响应请求action
      * 
      * @return
      */
@@ -60,8 +70,12 @@ public class HelloWorld {
         return "/HelloWorld/renderAjax";
     }
 
+    /**
+     * action中获取请求参数
+     * 
+     * @return
+     */
     @Url
-    @ActionResult
     public String actioncontext() {
         HttpServletRequest req = ActionContext.getActionContext().getReq();
         System.out.println("actioncontext method,path is ==>"
@@ -78,6 +92,14 @@ public class HelloWorld {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
     }
 
 }
