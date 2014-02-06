@@ -8,8 +8,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.aicai.annotation.ActionResult;
-import com.aicai.annotation.Ajax;
+import com.aicai.annotation.RT;
+import com.aicai.annotation.Result;
 import com.aicai.core.ActionExecutor;
 
 public class ResultUtil {
@@ -18,11 +18,14 @@ public class ResultUtil {
 
     public static void dealResult(Method method, Object returnValue,
             HttpServletRequest req, HttpServletResponse resp, ActionExecutor ace) {
-        // now this method only can deal jsp
-        // TODO
         if (returnValue instanceof String) {
             String result = (String) returnValue;
-            if (method.isAnnotationPresent(Ajax.class)) {
+            // if
+            // (method.getDeclaringClass().isAnnotationPresent(Results.class)) {
+            // Result[] results = method.getAnnotation(Results.class).value();
+            // }
+            if (method.isAnnotationPresent(Result.class)
+                    && method.getAnnotation(Result.class).type() == RT.AJAX) {
                 PrintWriter writer = null;
                 resp.setHeader("Pragma", "no-cache");
                 resp.setHeader("Cache-Control", "no-cache");
@@ -40,17 +43,33 @@ public class ResultUtil {
                 }
                 return;
             }
-            if (method.isAnnotationPresent(ActionResult.class)) {
+            if (method.isAnnotationPresent(Result.class)
+                    && method.getAnnotation(Result.class).type() == RT.ACTION) {
                 ace.execute(req, resp, result);
                 return;
             }
+            if (method.isAnnotationPresent(Result.class)
+                    && method.getAnnotation(Result.class).type() == RT.REDIRECT) {
+                try {
+                    resp.sendRedirect(result);
+                } catch (IOException e) {
+                    throw new RuntimeException("render jsp failed");
+                }
+                return;
+            }
+
+            // default the way of render is jsp;
+            // if (method.isAnnotationPresent(Result.class)
+            // && method.getAnnotation(Result.class).type() == RT.JSP) {
             // try {
-            // resp.sendRedirect(result);
+            // req.getRequestDispatcher(result).forward(req, resp);
+            // } catch (ServletException e) {
+            // throw new RuntimeException("render jsp failed");
             // } catch (IOException e) {
             // throw new RuntimeException("render jsp failed");
             // }
             // return;
-            // default the way of render is jsp;
+            // }
             try {
                 req.getRequestDispatcher(result).forward(req, resp);
             } catch (ServletException e) {
@@ -59,7 +78,6 @@ public class ResultUtil {
                 throw new RuntimeException("render jsp failed");
             }
             return;
-
         }
 
     }

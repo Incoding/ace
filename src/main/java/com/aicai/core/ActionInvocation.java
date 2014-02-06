@@ -52,11 +52,7 @@ public class ActionInvocation {
                         + ",name=" + actionmethod
                         + "can not find corresponding action");
             }
-            // ActionMapping am = new ActionMapping("HelloWorld",
-            // "com.aicai.mvc",
-            // "helloworld", null);
         }
         return returnValue;
-
     }
 }

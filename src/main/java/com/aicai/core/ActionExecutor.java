@@ -12,6 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import jodd.util.StringUtil;
+
 import com.aicai.interceptor.Interceptor;
 import com.aicai.interceptor.Test2Interceptor;
 import com.aicai.interceptor.TestInterceptor;
@@ -22,14 +24,9 @@ import com.aicai.util.ResultUtil;
 public class ActionExecutor {
     public static ConcurrentHashMap<String, ActionWrapper> actionMaping = new ConcurrentHashMap<String, ActionWrapper>();
 
-    // public static Iterator<Interceptor> iterator = null;
-
     public void init() {
         Set<Class<?>> actionClasses = ClassUtil.getClasses("com.aicai.mvc");
         ClassUtil.registerAction(actionClasses, actionMaping);
-        // List<Interceptor> interList = new ArrayList<Interceptor>();
-        // interList.add(new TestInterceptor());
-        // interList.add(new Test2Interceptor());
     }
 
     public void execute(HttpServletRequest req, HttpServletResponse resp,
@@ -43,12 +40,11 @@ public class ActionExecutor {
             uri = req.getRequestURI();
         }
         // TODO string split performance
-        String[] uriArray = uri.split("/");
+        String[] uriArray = StringUtil.split(uri, "/");
         String actionName = uriArray[uriArray.length - 2];
         String actionmethod = uriArray[uriArray.length - 1];
-        // String method = uri.substring(uri.lastIndexOf("/"));
         ActionWrapper aw = actionMaping.get(actionName + actionmethod);
-        Object action;
+        Object action = null;
         try {
             action = aw.getControllerClass().getDeclaredConstructor()
                     .newInstance();
@@ -77,45 +73,11 @@ public class ActionExecutor {
         }
     }
 
-    /**
-     * @param req
-     * @param resp
-     * @param actionName
-     * @param actionmethod
-     * @param aw
-     * @param iterator
-     */
-    // private void invocation(HttpServletRequest req, HttpServletResponse resp,
-    // String actionName, String actionmethod, ActionWrapper aw,
-    // Iterator<Interceptor> iterator) {
-    // while (iterator.hasNext()) {
-    // Interceptor interceptor = iterator.next();
-    // try {
-    // interceptor.intercept(null);
-    // } catch (Exception e) {
-    // e.printStackTrace();
-    // throw new RuntimeException("interceptor error ", e);
-    // }
-    // }
-    // if (null != aw) {
-    // actionExecutor(actionName, aw.getControllerClass(), actionmethod,
-    // aw.getMethod(), aw.getInParamNames(),
-    // aw.getOutParamNames(), req, resp);
-    // } else {
-    // throw new AicaiMvcException("path: action=" + actionName + ",name="
-    // + actionmethod + "can not find corresponding action");
-    // }
-    // // ActionMapping am = new ActionMapping("HelloWorld",
-    // // "com.aicai.mvc",
-    // // "helloworld", null);
-    // }
-
     static String actionExecutor(String actionName, Class<?> actionClass,
             String actionmethod, Method method,
             Map<String, Class<?>> inParamNames,
             Map<String, String> outParamNames, HttpServletRequest req,
             HttpServletResponse resp, Object action) {
-        Class<Object> c[] = null;
         Object[] ob = null;
         try {
             /*

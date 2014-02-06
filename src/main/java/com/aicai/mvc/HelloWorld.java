@@ -3,10 +3,10 @@ package com.aicai.mvc;
 import javax.servlet.http.HttpServletRequest;
 
 import com.aicai.annotation.Action;
-import com.aicai.annotation.ActionResult;
-import com.aicai.annotation.Ajax;
 import com.aicai.annotation.In;
 import com.aicai.annotation.Out;
+import com.aicai.annotation.RT;
+import com.aicai.annotation.Result;
 import com.aicai.annotation.Url;
 import com.aicai.core.ActionContext;
 
@@ -38,7 +38,7 @@ public class HelloWorld {
      * @return
      */
     @Url
-    @Ajax
+    @Result(type = RT.AJAX)
     public String renderAjax() {
         System.out.println("hello world ,hello aicai mvc");
         System.out.println("hello world -->name=" + name);
@@ -47,15 +47,15 @@ public class HelloWorld {
     }
 
     /**
-     * 响应请求action
+     * 响应请求action (重定向需要自己加上 context的前缀)
      * 
      * @return
      */
     @Url
-    @ActionResult
+    @Result(type = RT.REDIRECT)
     public String login() {
         System.out.println("login redirect method");
-        return "/aicai-mvc/HelloWorld/renderAjax";
+        return "/HelloWorld/renderAjax";
     }
 
     /**
@@ -64,7 +64,7 @@ public class HelloWorld {
      * @return
      */
     @Url
-    @ActionResult
+    @Result(type = RT.ACTION)
     public String loginForward() {
         System.out.println("login forward method");
         return "/HelloWorld/renderAjax";
@@ -76,6 +76,7 @@ public class HelloWorld {
      * @return
      */
     @Url
+    @Result(type = RT.ACTION)
     public String actioncontext() {
         HttpServletRequest req = ActionContext.getActionContext().getReq();
         System.out.println("actioncontext method,path is ==>"
