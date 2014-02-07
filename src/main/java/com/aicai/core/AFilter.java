@@ -14,13 +14,11 @@ import javax.servlet.http.HttpServletResponse;
 public class AFilter implements Filter {
     private ActionExecutor ace;
 
-    @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         ace = new ActionExecutor();
         ace.init();
     }
 
-    @Override
     public void doFilter(ServletRequest req, ServletResponse res,
             FilterChain chain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
@@ -33,7 +31,6 @@ public class AFilter implements Filter {
         // chain.doFilter(request, response);
     }
 
-    @Override
     public void destroy() {
 
     }
